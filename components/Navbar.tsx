@@ -1,59 +1,166 @@
+"use client"
 
-import Link  from "next/link"
-import { Button } from "@/components/ui/button";
-import gsap from "gsap"
-import { ScrollTrigger } from "gsap/ScrollTrigger"
+import React from "react"
+import Link from "next/link"
+import Image from "next/image"
+import { ChevronDown } from "lucide-react"
+import { ThemeToggler } from "@/components/utilities/theme-toggler"
+import BrandButton from "@/components/ui/BrandButton"
+import { cn } from "@/lib/utils"
+import { navLinks, CompanyDetails } from "@/data/Data"
+import type { NavLink, MenuItem } from "@/types/Navbar"
 
-import { GraduationCap } from "lucide-react"
-
-gsap.registerPlugin(ScrollTrigger)
+function hasItems(
+  link: NavLink
+): link is Extract<NavLink, { items: readonly MenuItem[] }> {
+  return "items" in link
+}
 
 const Navbar = () => {
+  const [productsOpen, setProductsOpen] = React.useState(false)
+  const closeTimerRef = React.useRef<number | null>(null)
+
+  const openProducts = () => {
+    if (closeTimerRef.current !== null) {
+      window.clearTimeout(closeTimerRef.current)
+      closeTimerRef.current = null
+    }
+
+    setProductsOpen(true)
+  }
+
+  const closeProducts = () => {
+    if (closeTimerRef.current !== null) {
+      window.clearTimeout(closeTimerRef.current)
+    }
+
+    closeTimerRef.current = window.setTimeout(() => {
+      setProductsOpen(false)
+      closeTimerRef.current = null
+    }, 120)
+  }
+
+  React.useEffect(() => {
+    return () => {
+      if (closeTimerRef.current !== null) {
+        window.clearTimeout(closeTimerRef.current)
+      }
+    }
+  }, [])
+
   return (
-    <header
-      className="fixed top-0 z-40 mx-auto h-14 w-full pt-4 transition-all sm:h-16 sm:pt-6"
-      style={{ opacity: 0 }}
-    >
-      <div className="pointer-events-none fixed top-0 right-0 left-0 z-0 h-20 bg-gradient-to-b from-background via-background/50 to-transparent sm:h-24"></div>
-      <div className="relative z-10 container flex items-center justify-between px-3 sm:px-4 md:px-6">
-        <div
-          className="flex items-center gap-2 sm:gap-3"
-          style={{ opacity: 0 }}
+    <header className="fixed top-3 left-1/2 z-50 w-[90%] -translate-x-1/2 rounded-xl border border-border bg-muted/80 md:top-0 md:left-0 md:w-full md:translate-x-0 md:rounded-none md:border-x-0 md:border-t-0 md:border-b md:bg-background">
+      <nav className="mx-auto flex h-11 w-full max-w-7xl items-center justify-between px-1.75 sm:px-6 md:h-16">
+        {/* Logo + Title */}
+        <Link
+          href="/"
+          className="tracking-snug ml-0.5 flex items-center gap-2 text-lg font-semibold text-foreground sm:ml-0 sm:text-xl"
         >
-          <div className="gradient-primary flex h-7 w-7 items-center justify-center rounded-sm sm:h-8 sm:w-8">
-            <GraduationCap className="h-5 w-5 text-secondary sm:h-6 sm:w-6" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-[#979797] sm:text-2xl">
-              NextRef.
-            </h1>
-          </div>
-        </div>
-        <div
-          className="absolute left-1/2 mt-2 hidden -translate-x-1/2 items-center space-x-4 rounded-lg border bg-secondary px-3 py-[8px] sm:flex md:space-x-8 md:px-5 md:py-[10px]"
-          style={{ opacity: 0 }}
-        >
-          <Link
-            href="/"
-            className="md:text-md text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Home
-          </Link>
-          <Link
-            href="/about"
-            className="md:text-md text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
-            About
-          </Link>
+          {CompanyDetails.logo}
+          <span>{CompanyDetails.title}</span>
+        </Link>
+
+        {/* Navigation Links */}
+        <div className="hidden items-center gap-3 md:flex">
+          {navLinks.map((link) =>
+            hasItems(link) ? (
+              <div
+                key={link.label}
+                className="group relative py-2"
+                onMouseEnter={openProducts}
+                onMouseLeave={closeProducts}
+                onFocusCapture={openProducts}
+                onBlurCapture={closeProducts}
+              >
+                <button
+                  type="button"
+                  aria-expanded={productsOpen}
+                  className={cn(
+                    "flex items-center gap-1 rounded-lg border border-transparent px-3 py-1.5 text-sm font-medium text-foreground/90 transition-colors",
+                    "hover:border-border/80 hover:bg-muted/50 hover:text-foreground",
+                    productsOpen &&
+                      "border-border/80 bg-muted/50 text-foreground shadow-sm"
+                  )}
+                >
+                  {link.label}
+                  <ChevronDown className="h-4 w-4 transition-transform duration-300 group-hover:rotate-180" />
+                </button>
+
+                <div
+                  className={cn(
+                    "pointer-events-none absolute top-[calc(100%-0.1rem)] left-1/3 w-[min(42rem,80vw)] origin-top -translate-x-1/3 rounded-xl border border-border/70 bg-background/95 p-2 opacity-0 shadow-2xl shadow-black/5 backdrop-blur-xl transition-all duration-200 ease-out",
+                    productsOpen
+                      ? "pointer-events-auto translate-y-0 scale-100 opacity-100"
+                      : "scale-95"
+                  )}
+                >
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    {link.items.map((item: MenuItem) => {
+                      const Icon = item.icon
+
+                      return (
+                        <Link
+                          key={item.title}
+                          href={item.href}
+                          className="group/item flex min-h-30 gap-3 rounded-lg border border-border/80 bg-muted/40 p-1.5 transition-all duration-200 hover:bg-muted/50 hover:shadow-sm"
+                        >
+                          <div className="relative w-32 shrink-0 self-stretch overflow-hidden rounded-lg border border-border/60 bg-background/80">
+                            <Image
+                              src={item.image}
+                              alt={item.title}
+                              fill
+                              className="object-cover object-center transition-transform duration-300"
+                              sizes="96px"
+                            />
+                          </div>
+                          <div className="min-w-0 flex-1 p-2">
+                            <div className="mb-2 flex items-center gap-2">
+                              <div className="inline-flex rounded-md border border-border/70 bg-muted/60 p-1 text-muted-foreground transition-colors group-hover/item:border-brand-color-1/30 group-hover/item:text-brand-color-1/70">
+                                <Icon className="h-4 w-4" />
+                              </div>
+                              <p className="text-sm font-semibold text-foreground">
+                                {item.title}
+                              </p>
+                            </div>
+                            <p className="mt-1 ml-1 line-clamp-2 text-sm leading-snug text-muted-foreground">
+                              {item.description}
+                            </p>
+                          </div>
+                        </Link>
+                      )
+                    })}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <Link
+                key={link.label}
+                href={link.href}
+                className={cn(
+                  "rounded-lg border border-transparent px-3 py-1.5 text-sm font-medium text-foreground/90 transition-colors",
+                  "hover:border-border/80 hover:bg-muted/50 hover:text-foreground hover:shadow-sm"
+                )}
+              >
+                {link.label}
+              </Link>
+            )
+          )}
         </div>
 
-        <div
-          className="flex items-center gap-2 sm:gap-3"
-          style={{ opacity: 0 }}
-        >
-          <Button>Get Started</Button>
+        {/* Theme Toggler + CTA Button */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          <ThemeToggler
+            direction="vertical"
+            duration={550}
+            className="scale-[0.9] bg-background/40 px-1 text-brand-color-1 dark:text-brand-color-3 active:scale-95 sm:scale-100 sm:bg-muted/80"
+            defaultTheme="dark"
+          />
+          <BrandButton
+            href={CompanyDetails.CTA.href}
+            label={CompanyDetails.CTA.label}
+          />
         </div>
-      </div>
+      </nav>
     </header>
   )
 }
