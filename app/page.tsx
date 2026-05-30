@@ -1,7 +1,7 @@
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
-import SectionDivider from '@/components/ui/SectionDivider';
+import SectionDivider from '@/components/groot-studio/SectionDivider';
 import Showcase from '@/components/Showcase';
 import Networks from '@/components/Networks';
 
@@ -16,9 +16,9 @@ const Page = () => {
         <div className="mx-auto flex w-full max-w-88 md:max-w-6xl flex-col border-x">
           <Hero />
           <SectionDivider />
-          <Showcase />
-          <SectionDivider />
           <Networks />
+          <SectionDivider />
+          <Showcase />
           <SectionDivider />
         </div>
       </main>

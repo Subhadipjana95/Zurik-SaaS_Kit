@@ -2,9 +2,9 @@ import React from "react"
 import { Command } from "lucide-react"
 import { Badge } from "./ui/badge"
 import Link from "next/link"
-import BrandButton from "./ui/BrandButton"
+import BrandButton from "./groot-studio/BrandButton"
 import Logo from "@/icons/Logo"
-import HeroGlow from "@/components/ui/HeroGlow"
+import HeroGlow from "@/components/groot-studio/HeroGlow"
 import { heroData } from "@/data/Hero.data"
 
 const Hero = () => {
@@ -18,16 +18,18 @@ const Hero = () => {
             <Command className="h-3 w-3" />
           </div>
           <span className="ml-2">
-            <span className="underline underline-offset-2">
-              {heroData.alertBanner.productName}
-            </span>{" "}
+            <Link href={heroData.alertBanner.href} passHref>
+              <span className="underline underline-offset-2 cursor-pointer">
+                {heroData.alertBanner.productName}
+              </span>
+            </Link>{" "}
             {heroData.alertBanner.statusText}
           </span>
         </span>{" "}
         <span className="mx-0.5"> </span>
-        <span className="hove:text-primary/80 cursor-pointer transition duration-300">
+        <span className="hove:text-primary/80 transition duration-300">
           {heroData.alertBanner.ctaPrefix}{" "}
-          <span className="rounded-sm border bg-brand-color-1/10 px-1 py-0.5 font-mono text-brand-color-3 dark:text-brand-color-1/80">
+          <span className="rounded-sm border bg-brand-color-1/10 px-1 py-0.5 font-mono text-brand-color-3 dark:text-brand-color-1/80 cursor-pointer">
             {heroData.alertBanner.promoCode}
           </span>{" "}
           {heroData.alertBanner.promoText}
